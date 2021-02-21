@@ -6,13 +6,15 @@ public class PlayerMove : MonoBehaviour
 {
     Rigidbody2D rigid;
     Animator anim;
+    Vector2 DirVec;
+    GameObject scanObject;
 
+    public GameManager manager;
     public float Speed;
     float h;
     float v;
     bool isHorizonMove;
-    Vector2 DirVec;
-    GameObject scanObject;
+
 
     private void Awake()
     {
@@ -65,23 +67,24 @@ public class PlayerMove : MonoBehaviour
 
         //Scan
         if (Input.GetButtonDown("Jump") && (scanObject != null))
-            Debug.Log("This is " + scanObject.name);
+            manager.Action(scanObject);
 
     }
     private void FixedUpdate()
     {
+        //isAction Freeze
+        Speed = manager.isAction ? 0 : 10;
+
         //Move
         Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
         rigid.velocity = moveVec * Speed;
-
-        //Ray
-        Debug.DrawRay(rigid.position, DirVec * 0.7f, Color.green);
-        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, DirVec, 0.7f, LayerMask.GetMask("Object"));
-        if (rayHit.collider != null)
-        {
-            scanObject = rayHit.collider.gameObject;
-        }
-        else
-            scanObject = null;
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        scanObject = collision.gameObject;
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        scanObject = null;
     }
 }
