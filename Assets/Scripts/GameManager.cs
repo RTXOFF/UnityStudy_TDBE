@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public TalkManager talkManager;
+    public QuestManager questManager;
     public Text talkText;
     public GameObject talkPanel;
     public GameObject scanObject;
@@ -13,6 +14,10 @@ public class GameManager : MonoBehaviour
     public bool isAction;
     public int talkIndex;
 
+    private void Start()
+    {
+        Debug.Log(questManager.CheckQuest());
+    }
 
     public void Action(GameObject scanObj)
     {
@@ -26,15 +31,19 @@ public class GameManager : MonoBehaviour
 
     void Talk(int id, bool isNpc)
     {
-        string talkData = talkManager.GetTalk(id, talkIndex);
+        //Set Talk Data
+        int questTalkIndex = questManager.GetQuestTalkIndex(id);
+        string talkData = talkManager.GetTalk(id + questTalkIndex, talkIndex);
 
+        //End Talk
         if (talkData == null)
         {
             isAction = false;
             talkIndex = 0; //대화가 끝났으니 0으로 초기화
+            Debug.Log(questManager.CheckQuest(id));
             return; //void 함수에서 return은 강제 종료 역할
         }
-
+        //Continue Talk
         if(isNpc)
         {
             talkText.text = talkData.Split(':')[0];
