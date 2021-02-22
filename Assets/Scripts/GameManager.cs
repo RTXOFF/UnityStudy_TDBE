@@ -29,13 +29,16 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
 
-        if(Input.GetButtonDown("Cancel"))
-        {
-            if (menuSet.activeSelf)
-                menuSet.SetActive(false);
-            else
-                menuSet.SetActive(true);
-        }
+        if (Input.GetButtonDown("Cancel"))
+            SubMenuActive();
+    }
+
+    public void SubMenuActive()
+    {
+        if (menuSet.activeSelf)
+            menuSet.SetActive(false);
+        else
+            menuSet.SetActive(true);
     }
 
     public void Action(GameObject scanObj)
