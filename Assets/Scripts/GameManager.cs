@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour
 {
     public TalkManager talkManager;
     public QuestManager questManager;
-    public Text talkText;
-    public GameObject talkPanel;
+    public TypeEffect talk;
+    public Animator talkPanel;
+    public Animator portraitAnim;
     public GameObject scanObject;
     public Image portraitImg;
+    public Sprite prevPortrait;
+
     public bool isAction;
     public int talkIndex;
 
@@ -26,14 +29,25 @@ public class GameManager : MonoBehaviour
         ObjectData objData = scanObject.GetComponent<ObjectData>();
         Talk(objData.id, objData.isNpc);
 
-        talkPanel.SetActive(isAction);
+        talkPanel.SetBool("isShow", isAction);
     }
 
     void Talk(int id, bool isNpc)
     {
         //Set Talk Data
-        int questTalkIndex = questManager.GetQuestTalkIndex(id);
-        string talkData = talkManager.GetTalk(id + questTalkIndex, talkIndex);
+        int questTalkIndex;
+        string talkData;
+
+        if (talk.isAnim)
+        {
+            talk.SetMsg("");
+            return;
+        }
+        else
+        {
+            questTalkIndex = questManager.GetQuestTalkIndex(id);
+            talkData = talkManager.GetTalk(id + questTalkIndex, talkIndex);
+        }
 
         //End Talk
         if (talkData == null)
@@ -46,15 +60,23 @@ public class GameManager : MonoBehaviour
         //Continue Talk
         if(isNpc)
         {
-            talkText.text = talkData.Split(':')[0];
+            talk.SetMsg(talkData.Split(':')[0]); 
 
+            //Show Portrait
             portraitImg.sprite = talkManager.GetPortarit(id, int.Parse(talkData.Split(':')[1]));
             //int.Parse() : 문자열을 해당 타입으로 변환해주는 함수.
             portraitImg.color = new Color(1, 1, 1, 1);
+            
+            //Animation Portrait
+            if(prevPortrait != portraitImg.sprite)
+            {
+                portraitAnim.SetTrigger("doEffect");
+                prevPortrait = portraitImg.sprite;
+            }
         }
         else
         {
-            talkText.text = talkData;
+            talk.SetMsg(talkData);
 
             portraitImg.color = new Color(1, 1, 1, 0);
         }
